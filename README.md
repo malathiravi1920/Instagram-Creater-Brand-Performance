@@ -13,43 +13,42 @@ A business intelligence dashboard built using **Streamlit**, **Python**, **Panda
 
 ##  Home Dashboard
 
-![Home Dashboard](screenshots/home_dashboard.png)
+![Home Dashboard]("C:\Users\ELCOT\Desktop\Instagram Creater&Brand Performance\screenshots\home_dashboard.png.png")
 
 ---
 
 ##  KPI Dashboard
 
-![KPI Cards](screenshots/kpi_dashboard.png)
+![KPI Cards]("C:\Users\ELCOT\Desktop\Instagram Creater&Brand Performance\screenshots\kpi_dashboard.png.png")
 
 ---
 
 ##  Content Performance
 
-![Content Performance](screenshots/content_performance.png)
+![Content Performance]("C:\Users\ELCOT\Desktop\Instagram Creater&Brand Performance\screenshots\content_performance.png).png")
 
 ---
 
 ##  Best Posting Time
 
-![Posting Time](screenshots/posting_time.png)
-
+![Posting Time]("C:\Users\ELCOT\Desktop\Instagram Creater&Brand Performance\screenshots\posting_time.png.png")
 ---
 
 ## 🏷 Category Analysis
 
-![Category Analysis](screenshots/category_analysis.png)
+![Category Analysis]("C:\Users\ELCOT\Desktop\Instagram Creater&Brand Performance\screenshots\category_analysis.png.png")
 
 ---
 
 ##  Growth Analysis
 
-![Growth Analysis](screenshots/growth_analysis.png)
+![Growth Analysis]("C:\Users\ELCOT\Desktop\Instagram Creater&Brand Performance\screenshots\growth_analysis.png.png")
 
 ---
 
 ##  Export Data
 
-![Export Data](screenshots/export_data.png)
+![Export Data]("C:\Users\ELCOT\Desktop\Instagram Creater&Brand Performance\screenshots\export_data.png.png")
 
 ---
 
