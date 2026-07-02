@@ -145,7 +145,7 @@ except Exception as e:
 # ---------------------------------------------------
 # SIDEBAR FILTER ENGINE
 # ---------------------------------------------------
-st.sidebar.image("https://wikimedia.org", width=50)
+
 st.sidebar.title("🔍 Tactical Filters")
 
 category_opts = sorted(df["Category"].dropna().unique())
@@ -293,68 +293,178 @@ with tab1:
                 fig_cat.update_traces(textposition="top center")
                 st.plotly_chart(fig_cat, use_container_width=True)
                 
-            with col3_2:
-                tags_exploded = filtered.assign(Hashtags=filtered["Hashtags"].str.split(", ")).explode("Hashtags")
-                tag_summary = tags_exploded.groupby("Hashtags")["Engagement_Rate"].mean().reset_index().sort_values(by="Engagement_Rate", ascending=False).head(10)
-                fig_tags = px.bar(
-                    tag_summary, x="Engagement_Rate", y="Hashtags", orientation="h",
-                    title="Top 10 High-Yield Hashtag Phrases",
-                    labels={"Engagement_Rate": "Avg Engagement (%)", "Hashtags": "Hashtag"},
-                    color="Engagement_Rate", color_continuous_scale="Sunset"
-                )
-                fig_tags.update_layout(yaxis={'categoryorder':'total ascending'}, plot_bgcolor="rgba(0,0,0,0)")
+            with col3_2: 
+                tags_exploded = filtered.assign(Hashtags=filtered["Hashtags"].str.split(", ")).explode("Hashtags") 
+    
+                tag_summary = tags_exploded.groupby("Hashtags")["Engagement_Rate"].mean().reset_index().sort_values(by="Engagement_Rate", ascending=False).head(10) 
+    
+    # 1. Force round the actual data to 2 decimal places and create a string column for display
+                tag_summary["Engagement_Text"] = tag_summary["Engagement_Rate"].round(2).astype(str) + "%"
+    
+                fig_tags = px.bar( 
+                    tag_summary, 
+                    x="Engagement_Rate", 
+                    y="Hashtags", 
+                    orientation="h", 
+                    title="Top 10 High-Yield Hashtag Phrases", 
+                    labels={"Engagement_Rate": "Avg Engagement (%)", "Hashtags": "Hashtag"}, 
+                    color="Engagement_Rate", 
+                    color_continuous_scale="Sunset",
+        # 2. Feed the formatted text directly into custom data
+                    custom_data=["Engagement_Text"]
+    ) 
+    
+                fig_tags.update_layout(
+                    yaxis={'categoryorder':'total ascending'}, 
+                    xaxis={'ticksuffix': '%'},  # Adds % sign to the x-axis numbers
+                    plot_bgcolor="rgba(0,0,0,0)"
+    ) 
+    
+    # 3. Pull the exact string from custom data into the hover box
+                fig_tags.update_traces(
+                    hovertemplate="<b>Hashtag:</b> %{y}<br><b>Avg Engagement:</b> %{customdata[0]}<extra></extra>"
+    )
+    
                 st.plotly_chart(fig_tags, use_container_width=True)
 
         # ---------------------------------------------------------------------------------------
         # TAB 4: FOLLOWER GROWTH DRIVERS
         # ---------------------------------------------------------------------------------------
         with tab4:
-            st.subheader("How do likes, comments, shares, and saves influence follower growth?")
-            
+            st.subheader("Which User Actions Drive True Follower Growth?")
+    
+    # Calculate impact strength (using correlation safely)
             interaction_cols = ["Likes", "Comments", "Shares", "Saves"]
             corr_matrix = filtered[interaction_cols + ["Follower_Growth"]].corr()[["Follower_Growth"]].reset_index()
             corr_matrix = corr_matrix[corr_matrix["index"] != "Follower_Growth"]
-            
-            col4_1, col4_2 = st.columns([1, 2])
-            
-            with col4_1:
-                st.markdown("""
-                **Executive Takeaways on Growth Drivers:**
-                * High correlation strength indicates direct impact on the algorithmic visibility engine.
-                * **Shares and Saves** frequently serve as velocity catalysts, triggering placements on the Explore tab.
-                * **Comments and Likes** solidify baseline engagement, retaining audience pools.
-                """)
-                st.dataframe(
-                    corr_matrix.rename(columns={"index": "User Action Type", "Follower_Growth": "Correlation Weight"}),
-                    hide_index=True,
-                    use_container_width=True
-                )
-                
-            with col4_2:
-                fig_corr = px.bar(
-                    corr_matrix, x="index", y="Follower_Growth",
-                    title="Growth Engine Impact Matrix (Correlation Metrics)",
-                    labels={"Follower_Growth": "Correlation Strength", "index": "Metric Class"},
-                    color="Follower_Growth", color_continuous_scale="Purples"
-                )
-                fig_corr.update_layout(plot_bgcolor="rgba(0,0,0,0)")
-                st.plotly_chart(fig_corr, use_container_width=True)
+    
+    # Rename technical labels to business-friendly language
+            corr_matrix = corr_matrix.rename(columns={"index": "User Action", "Follower_Growth": "Impact_Score"})
+    
+    # Create an easy-to-read text column (e.g., 0.85 becomes 85% Match)
+            corr_matrix["Display_Score"] = (corr_matrix["Impact_Score"] * 100).round(0).astype(int).astype(str) + "% Match"
+    
+    # Render the chart at full dashboard width
+            fig_corr = px.bar(
+            corr_matrix, 
+            x="User Action", 
+            y="Impact_Score",
+            title="What Content Actions Drive Growth Fastest?",
+            labels={"Impact_Score": "Growth Impact Power", "User Action": "Action Type"},
+            color="Impact_Score", 
+            color_continuous_scale="Purples",
+            custom_data=["Display_Score"] # Feeds clean text to the hover box
+    )
+    
+    # Simplify the chart axes for visual clarity
+            fig_corr.update_layout(
+            plot_bgcolor="rgba(0,0,0,0)",
+            yaxis={'showticklabels': False}, # Hides confusing decimal axis numbers
+            xaxis_title=None
+    )
+    
+    # Show exact clean percentages when hovering over bars
+            fig_corr.update_traces(
+            hovertemplate="<b>Action:</b> %{x}<br><b>Growth Impact:</b> %{customdata}<extra></extra>"
+    )
+    
+            st.plotly_chart(fig_corr, use_container_width=True)
+
 
     # ---------------------------------------------------
 # 8. DATA INSPECTION & EXPORT UTILITY
 # ---------------------------------------------------
+# 8. DATA INSPECTION & EXPORT UTILITY
+# ---------------------------------------------------
+    # ---------------------------------------------------
+    # DYNAMIC EXECUTIVE BUSINESS INSIGHTS
+    # ---------------------------------------------------
+# --------------------------------------------
+# BUSINESS INSIGHTS
+# --------------------------------------------
+
+st.markdown("---")
+st.subheader("💡 Business Insights")
+
+if not filtered.empty:
+
+    # Overall ROI
+    overall_roi = total_roi / total_spend if total_spend > 0 else 0
+
+    # Best Content Type
+    content_summary = filtered.groupby("Content_Type")["Engagement_Rate"].mean().reset_index()
+    best_content = content_summary.loc[content_summary["Engagement_Rate"].idxmax()]
+
+    # Best ROI Content
+    roi_summary = filtered.groupby("Content_Type").agg(
+        Cost=("Campaign_Cost", "sum"),
+        ROI=("Campaign_ROI", "sum")
+    ).reset_index()
+
+    roi_summary["ROI_Multiplier"] = roi_summary["ROI"] / roi_summary["Cost"]
+    best_roi = roi_summary.loc[roi_summary["ROI_Multiplier"].idxmax()]
+
+    # Highest Budget Campaign
+    campaign_summary = filtered.groupby("Campaign").agg(
+        Total_Spend=("Campaign_Cost", "sum"),
+        Follower_Growth=("Follower_Growth", "sum")
+    ).reset_index()
+
+    highest_budget = campaign_summary.loc[campaign_summary["Total_Spend"].idxmax()]
+    highest_growth = campaign_summary.loc[campaign_summary["Follower_Growth"].idxmax()]
+
+    col1, col2 = st.columns(2)
+
+    # ---------------- Left Box ----------------
+
+    with col1:
+        with st.container(border=True):
+
+            st.markdown("### 📊 Key Findings")
+
+            st.write(f"✅ **Highest Engagement Content:** {best_content['Content_Type']}")
+
+            st.write(f"✅ **Best ROI Content:** {best_roi['Content_Type']}")
+
+            st.write(f"✅ **Overall Campaign ROI:** {overall_roi:.2f}x")
+
+            st.write(f"✅ **Highest Budget Campaign:** {highest_budget['Campaign']}")
+
+    # ---------------- Right Box ----------------
+
+    with col2:
+        with st.container(border=True):
+
+            st.markdown("### 📈 Performance Summary")
+
+            st.write(f"📱 **Best Content Type:** {best_content['Content_Type']}")
+
+            st.write(f"💰 **Best ROI:** {best_roi['ROI_Multiplier']:.2f}x Return")
+
+            st.write(f"🚀 **Highest Follower Growth:** {highest_growth['Campaign']}")
+
+            st.write("📊 **Overall Performance:** Positive Campaign ROI")
+
+else:
+    st.warning("No data available for the selected filters.")
+
+
 st.markdown("---")
 st.subheader("📥 Cleaned Presentation Data Sheet")
 
-with st.expander("Click to view and export the audit-ready campaign records"):
-    st.dataframe(filtered, use_container_width=True, hide_index=True)
-    
-    # Generate download data stream instantly
-    csv_bytes = filtered.to_csv(index=False).encode('utf-8')
-    st.download_button(
-        label="💾 Download Filtered Performance Records (.CSV)",
-        data=csv_bytes,
-        file_name="instagram_performance_report.csv",
-        mime="text/csv"
-    )
-    
+if not filtered.empty:
+    with st.expander("Click to view and export the audit-ready campaign records", expanded=True):
+        # Display the tailored dataframe
+        st.dataframe(filtered, use_container_width=True, hide_index=True)
+        
+        # Process clean CSV memory stream directly from the filtered view
+        csv_bytes = filtered.to_csv(index=False).encode('utf-8')
+        st.download_button(
+            label="💾 Download Filtered Performance Records (.CSV)",
+            data=csv_bytes,
+            file_name="instagram_performance_report.csv",
+            mime="text/csv",
+            use_container_width=True
+        )
+else:
+    st.info("No records match your active sidebar filter selection.")
