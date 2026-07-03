@@ -23,6 +23,20 @@ A business intelligence dashboard built using **Streamlit**, **Python**, **Panda
 ![Content Performance](screenshots/content_performance.png)
 
 
+## Posting Performance
+![Posting Performance](screenshots/posting_time.png)
+
+## Category Performance
+![Category Performance](screenshots/category_analysis.png)
+
+
+## Growth Performance
+![Growth Performance](screenshots/growth_analysis.png)
+
+## Export Performance
+![Export Performance](screenshots/export_data.png)
+
+
 #  Features
 
 - Executive KPI Dashboard
@@ -203,7 +217,7 @@ numpy
 
 ---
 
-# 🔮 Future Improvements
+#  Future Improvements
 
 - Login Authentication
 - Dark Theme
@@ -215,7 +229,7 @@ numpy
 
 ---
 
-# 👩‍💻 Author
+# Author
 
 **Malathi R**
 
