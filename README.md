@@ -9,25 +9,19 @@ A business intelligence dashboard built using **Streamlit**, **Python**, **Panda
 
 ---
 
-# Dashboard Screenshots
-
 ## Home Dashboard
-![Home Dashboard]("C:\Users\ELCOT\Desktop\Instagram Creater&Brand Performance\screenshots\home_dashboard.png")
+![Home Dashboard](screenshots/home_dashboard.png)
 
 ---
 
 ## KPI Dashboard
-![KPI Cards]("C:\Users\ELCOT\Desktop\Instagram Creater&Brand Performance\screenshots\kpi_dashboard.png")
+![KPI Cards](screenshots/kpi_dashboard.png)
 
 ---
 
 ## Content Performance
-![Content Performance]("C:\Users\ELCOT\Desktop\Instagram Creater&Brand Performance\screenshots\content_performance.png")
+![Content Performance](screenshots/content_performance.png)
 
----
-
-## Best Posting Time
-![Posting Time]("C:\Users\ELCOT\Desktop\Instagram Creater&Brand Performance\screenshots\posting_time.png")
 
 #  Features
 
